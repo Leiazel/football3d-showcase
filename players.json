@@ -1,0 +1,112 @@
+[
+  {
+    "slug": "daniele-de-rossi",
+    "name": "Daniele De Rossi",
+    "verts": 14024,
+    "tris": 20000,
+    "frames": 24,
+    "cols": 4,
+    "rows": 6,
+    "cell": 512
+  },
+  {
+    "slug": "david-beckham",
+    "name": "David Beckham",
+    "verts": 12420,
+    "tris": 20000,
+    "frames": 24,
+    "cols": 4,
+    "rows": 6,
+    "cell": 512
+  },
+  {
+    "slug": "heung-min-son",
+    "name": "Heung Min Son",
+    "verts": 17310,
+    "tris": 20000,
+    "frames": 24,
+    "cols": 4,
+    "rows": 6,
+    "cell": 512
+  },
+  {
+    "slug": "jack-grealish",
+    "name": "Jack Grealish",
+    "verts": 14378,
+    "tris": 20000,
+    "frames": 24,
+    "cols": 4,
+    "rows": 6,
+    "cell": 512
+  },
+  {
+    "slug": "julian-alvarez",
+    "name": "Julian Alvarez",
+    "verts": 22849,
+    "tris": 20000,
+    "frames": 24,
+    "cols": 4,
+    "rows": 6,
+    "cell": 512
+  },
+  {
+    "slug": "lucas-bergvall",
+    "name": "Lucas Bergvall",
+    "verts": 14650,
+    "tris": 20000,
+    "frames": 24,
+    "cols": 4,
+    "rows": 6,
+    "cell": 512
+  },
+  {
+    "slug": "mykhailo-mudryk",
+    "name": "Mykhailo Mudryk",
+    "verts": 16718,
+    "tris": 20000,
+    "frames": 24,
+    "cols": 4,
+    "rows": 6,
+    "cell": 512
+  },
+  {
+    "slug": "radja-nainggolan",
+    "name": "Radja Nainggolan",
+    "verts": 14666,
+    "tris": 20000,
+    "frames": 24,
+    "cols": 4,
+    "rows": 6,
+    "cell": 512
+  },
+  {
+    "slug": "rodrigo-de-paul",
+    "name": "Rodrigo De Paul",
+    "verts": 20025,
+    "tris": 20000,
+    "frames": 24,
+    "cols": 4,
+    "rows": 6,
+    "cell": 512
+  },
+  {
+    "slug": "vanja-milinkovic-savic",
+    "name": "Vanja Milinkovic Savic",
+    "verts": 14669,
+    "tris": 20000,
+    "frames": 24,
+    "cols": 4,
+    "rows": 6,
+    "cell": 512
+  },
+  {
+    "slug": "zlatan-ibrahimovic",
+    "name": "Zlatan Ibrahimovic",
+    "verts": 15709,
+    "tris": 20000,
+    "frames": 24,
+    "cols": 4,
+    "rows": 6,
+    "cell": 512
+  }
+]
