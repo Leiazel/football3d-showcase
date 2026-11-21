@@ -2,160 +2,455 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Football 3D Studio — Visor 360° Protegido</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Football 3D Studio — Galería 360°</title>
   <style>
     :root {
-      --bg-panel: rgba(13, 18, 30, 0.78);
-      --border: rgba(255, 255, 255, 0.12);
-      --accent: #38bdf8;
-      --accent-2: #22c55e;
-      --text: #f1f5f9;
-      --muted: #94a3b8;
+      --bg-panel: rgba(251, 247, 240, 0.88);
+      --bg-panel-solid: #fbf7f0;
+      --bg-item: rgba(120, 92, 74, 0.07);
+      --bg-item-hover: rgba(185, 28, 28, 0.09);
+      --border: rgba(120, 88, 68, 0.20);
+      --accent: #b91c1c;
+      --accent-bright: #dc2626;
+      --accent-soft: rgba(185, 28, 28, 0.13);
+      --sand: #d6c5ae;
+      --text: #241815;
+      --muted: #6e5a50;
+      --shadow: 0 12px 32px rgba(48, 24, 18, 0.12);
     }
+
     * { box-sizing: border-box; margin: 0; padding: 0; }
+
     html, body {
-      width: 100%; height: 100%; overflow: hidden;
+      width: 100%; height: 100%;
+      overflow: hidden;
       font-family: Inter, ui-sans-serif, system-ui, -apple-system, sans-serif;
       color: var(--text);
-      background: radial-gradient(circle at 50% 35%, #1e293b 0%, #090d16 75%);
-      user-select: none; -webkit-user-select: none;
+      background: radial-gradient(circle at 52% 38%, #f7f1e6 0%, #e4d6c2 68%, #d2bfa6 100%);
+      user-select: none;
+      -webkit-user-select: none;
+      -webkit-tap-highlight-color: transparent;
     }
+
     #stage {
-      position: fixed; inset: 0; width: 100%; height: 100%;
-      display: flex; align-items: center; justify-content: center;
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding-left: 260px;
       cursor: grab;
+      touch-action: none;
     }
     #stage:active { cursor: grabbing; }
+
     #view-canvas {
-      width: min(78vh, 88vw);
-      height: min(78vh, 88vw);
-      max-width: 720px; max-height: 720px;
+      width: min(76vh, calc(100vw - 320px));
+      height: min(76vh, calc(100vw - 320px));
+      max-width: 720px;
+      max-height: 720px;
       pointer-events: none;
-      filter: drop-shadow(0 28px 50px rgba(0, 0, 0, 0.55));
+      filter: drop-shadow(0 24px 44px rgba(45, 20, 14, 0.28));
     }
 
-    .hud { transition: opacity 0.25s ease; }
+    .hud { transition: opacity 0.25s ease, transform 0.25s ease; }
     body.clean-mode .hud { opacity: 0; pointer-events: none; }
 
+    /* Topbar */
     .topbar {
-      position: fixed; top: 16px; left: 16px; right: 16px;
-      display: flex; align-items: center; justify-content: space-between;
-      pointer-events: none; z-index: 10;
+      position: fixed;
+      top: 16px; left: 16px; right: 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 12px;
+      pointer-events: none;
+      z-index: 20;
     }
+
     .brand {
       pointer-events: auto;
-      display: flex; align-items: center; gap: 10px;
-      background: var(--bg-panel); backdrop-filter: blur(12px);
-      border: 1px solid var(--border); border-radius: 14px;
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: 14px;
       padding: 10px 16px;
+      box-shadow: var(--shadow);
     }
+
     .brand-dot {
-      width: 10px; height: 10px; border-radius: 50%;
-      background: linear-gradient(135deg, var(--accent), var(--accent-2));
-      box-shadow: 0 0 12px var(--accent);
+      width: 11px; height: 11px; border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent-bright), #7f1d1d);
+      box-shadow: 0 0 10px rgba(185, 28, 28, 0.5);
+      flex-shrink: 0;
     }
-    .brand h1 { font-size: 14px; font-weight: 700; letter-spacing: 0.3px; }
-    .brand span { font-size: 12px; color: var(--muted); font-weight: 500; }
-    .badge-lock {
-      font-size: 10.5px; font-weight: 700; color: #86efac;
-      background: rgba(34, 197, 94, 0.14); border: 1px solid rgba(34, 197, 94, 0.35);
-      padding: 3px 8px; border-radius: 999px; margin-left: 6px;
+
+    .brand h1 {
+      font-size: 14px;
+      font-weight: 800;
+      letter-spacing: 0.2px;
+      color: var(--text);
+      line-height: 1.2;
+    }
+
+    .brand span {
+      font-size: 12px;
+      color: var(--muted);
+      font-weight: 500;
+      display: block;
     }
 
     .top-actions {
       pointer-events: auto;
-      display: flex; gap: 8px; flex-wrap: wrap;
-    }
-    .btn {
-      appearance: none; border: 1px solid var(--border);
-      background: var(--bg-panel); backdrop-filter: blur(12px);
-      color: var(--text); font-size: 12.5px; font-weight: 600;
-      padding: 9px 14px; border-radius: 12px; cursor: pointer;
-      display: inline-flex; align-items: center; gap: 6px;
-      transition: all 0.15s ease;
-    }
-    .btn:hover { border-color: rgba(56, 189, 248, 0.55); transform: translateY(-1px); }
-    .btn.active {
-      background: rgba(56, 189, 248, 0.2);
-      border-color: var(--accent); color: #e0f2fe;
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+      justify-content: flex-end;
     }
 
-    .sidebar {
-      position: fixed; left: 16px; top: 76px; bottom: 16px; width: 280px;
-      display: flex; flex-direction: column; gap: 12px;
-      pointer-events: none; z-index: 10;
+    .btn {
+      appearance: none;
+      border: 1px solid var(--border);
+      background: var(--bg-panel);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      color: var(--text);
+      font-size: 12.5px;
+      font-weight: 600;
+      padding: 9px 14px;
+      border-radius: 12px;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      box-shadow: var(--shadow);
+      transition: all 0.15s ease;
+      white-space: nowrap;
     }
+    .btn:hover {
+      border-color: rgba(185, 28, 28, 0.55);
+      transform: translateY(-1px);
+    }
+    .btn.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fdf8f3;
+    }
+
+    /* Sidebar (Desktop) */
+    .sidebar {
+      position: fixed;
+      left: 16px; top: 80px; bottom: 16px;
+      width: 280px;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+      pointer-events: none;
+      z-index: 15;
+    }
+
     .panel {
       pointer-events: auto;
-      background: var(--bg-panel); backdrop-filter: blur(14px);
-      border: 1px solid var(--border); border-radius: 16px;
-      padding: 14px; display: flex; flex-direction: column; gap: 10px;
+      background: var(--bg-panel);
+      backdrop-filter: blur(14px);
+      -webkit-backdrop-filter: blur(14px);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: var(--shadow);
     }
+
     .panel-title {
-      font-size: 11px; text-transform: uppercase; letter-spacing: 0.9px;
-      color: var(--muted); font-weight: 700;
-    }
-    .model-list {
-      display: flex; flex-direction: column; gap: 6px;
-      max-height: 280px; overflow-y: auto; padding-right: 4px;
-    }
-    .model-item {
-      display: flex; align-items: center; justify-content: space-between;
-      padding: 9px 11px; border-radius: 10px; cursor: pointer;
-      background: rgba(255, 255, 255, 0.04);
-      border: 1px solid transparent; font-size: 12.5px; font-weight: 500;
-      transition: all 0.12s ease;
-    }
-    .model-item:hover { background: rgba(255, 255, 255, 0.08); }
-    .model-item.active {
-      background: rgba(56, 189, 248, 0.18);
-      border-color: rgba(56, 189, 248, 0.55);
+      font-size: 11px;
+      text-transform: uppercase;
+      letter-spacing: 0.9px;
+      color: var(--muted);
       font-weight: 700;
     }
-    .model-item small { color: var(--muted); font-size: 11px; font-weight: 500; }
+
+    .model-list {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      max-height: 290px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .model-list::-webkit-scrollbar { width: 5px; height: 5px; }
+    .model-list::-webkit-scrollbar-thumb { background: rgba(120, 88, 68, 0.35); border-radius: 99px; }
+
+    .model-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 9px 11px;
+      border-radius: 10px;
+      cursor: pointer;
+      background: var(--bg-item);
+      border: 1px solid transparent;
+      font-size: 12.5px;
+      font-weight: 500;
+      color: var(--text);
+      transition: all 0.12s ease;
+    }
+    .model-item:hover { background: var(--bg-item-hover); }
+    .model-item.active {
+      background: var(--accent-soft);
+      border-color: rgba(185, 28, 28, 0.55);
+      color: #7f1d1d;
+      font-weight: 700;
+    }
+    .model-item small {
+      color: var(--muted);
+      font-size: 11px;
+      font-weight: 500;
+    }
+    .model-item.active small { color: #991b1b; }
 
     .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
     .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+
     .chip {
-      padding: 7px 8px; border-radius: 9px; font-size: 11.5px; font-weight: 600;
-      text-align: center; cursor: pointer;
-      background: rgba(255, 255, 255, 0.05); border: 1px solid var(--border);
+      padding: 7px 8px;
+      border-radius: 9px;
+      font-size: 11.5px;
+      font-weight: 600;
+      text-align: center;
+      cursor: pointer;
+      background: var(--bg-item);
+      border: 1px solid var(--border);
       color: var(--text);
+      transition: all 0.12s ease;
     }
-    .chip:hover { border-color: rgba(56, 189, 248, 0.5); }
-    .chip.active { background: rgba(56, 189, 248, 0.22); border-color: var(--accent); }
+    .chip:hover { border-color: rgba(185, 28, 28, 0.5); }
+    .chip.active {
+      background: var(--accent);
+      border-color: var(--accent);
+      color: #fdf8f3;
+    }
 
     .slider-row {
-      display: flex; flex-direction: column; gap: 4px; font-size: 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+      font-size: 12px;
     }
     .slider-row header {
-      display: flex; justify-content: space-between; color: var(--muted);
+      display: flex;
+      justify-content: space-between;
+      color: var(--muted);
+      font-weight: 500;
     }
-    input[type="range"] { width: 100%; accent-color: var(--accent); cursor: pointer; }
+    input[type="range"] {
+      width: 100%;
+      accent-color: var(--accent);
+      cursor: pointer;
+    }
 
     .stats {
-      font-size: 11.5px; color: var(--muted); line-height: 1.5;
-      border-top: 1px solid var(--border); padding-top: 8px;
+      font-size: 11.5px;
+      color: var(--muted);
+      line-height: 1.5;
+      border-top: 1px solid var(--border);
+      padding-top: 8px;
     }
     .stats strong { color: var(--text); }
 
     .hint-pill {
-      position: fixed; right: 16px; bottom: 16px; z-index: 10;
-      background: var(--bg-panel); border: 1px solid var(--border);
-      padding: 8px 12px; border-radius: 999px; font-size: 11.5px; color: var(--muted);
+      position: fixed;
+      right: 16px; bottom: 16px;
+      z-index: 15;
+      background: var(--bg-panel);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--border);
+      padding: 8px 13px;
+      border-radius: 999px;
+      font-size: 11.5px;
+      color: var(--muted);
+      box-shadow: var(--shadow);
     }
     .hint-pill kbd {
-      background: rgba(255, 255, 255, 0.12); color: var(--text);
-      padding: 2px 6px; border-radius: 5px; font-family: inherit; font-weight: 600;
+      background: rgba(185, 28, 28, 0.12);
+      color: #881313;
+      padding: 2px 6px;
+      border-radius: 5px;
+      font-family: inherit;
+      font-weight: 700;
     }
+
     .loader-pill {
-      position: fixed; top: 82px; right: 16px; z-index: 20;
-      background: rgba(15, 23, 42, 0.9); border: 1px solid rgba(56, 189, 248, 0.45);
-      padding: 8px 14px; border-radius: 12px; font-size: 12px; color: #e0f2fe;
+      position: fixed;
+      top: 76px; right: 16px;
+      z-index: 25;
+      background: var(--bg-panel-solid);
+      border: 1px solid rgba(185, 28, 28, 0.45);
+      padding: 8px 14px;
+      border-radius: 12px;
+      font-size: 12px;
+      font-weight: 600;
+      color: var(--accent);
+      box-shadow: var(--shadow);
       display: none;
     }
     .loader-pill.visible { display: block; }
+
+    /* Botón ajustes solo visible en mobile */
+    #btn-mobile-drawer { display: none; }
+    .mobile-sheet-header { display: none; }
+
+    /* ===================== MOBILE RESPONSIVE ===================== */
+    @media (max-width: 860px) {
+      html, body {
+        overflow: hidden;
+      }
+
+      .topbar {
+        top: 10px; left: 10px; right: 10px;
+        flex-wrap: nowrap;
+        gap: 8px;
+      }
+
+      .brand {
+        padding: 7px 10px;
+        border-radius: 12px;
+        min-width: 0;
+        flex: 1;
+        gap: 8px;
+      }
+      .brand h1 {
+        font-size: 12px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+      .brand span {
+        font-size: 11px;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .top-actions {
+        flex-wrap: nowrap;
+        gap: 5px;
+      }
+
+      .btn {
+        padding: 8px 9px;
+        font-size: 11.5px;
+        border-radius: 10px;
+      }
+
+      /* Ocultamos "Modo Limpio (H)" y texto largo en mobile para que no sature */
+      #btn-clean { display: none; }
+      #btn-mobile-drawer { display: inline-flex; padding: 8px 10px; }
+      .btn .btn-label-desktop { display: none; }
+
+      /* El escenario ocupa la parte superior/central libre */
+      #stage {
+        position: fixed;
+        top: 56px;
+        left: 0;
+        right: 0;
+        bottom: 124px;
+        height: auto;
+        padding-left: 0;
+      }
+
+      #view-canvas {
+        width: min(88vw, 54vh);
+        height: min(88vw, 54vh);
+      }
+
+      /* Sidebar pasa a ser una barra inferior con carrusel horizontal de jugadores + panel desplegable de ajustes */
+      .sidebar {
+        position: fixed;
+        left: 0; right: 0; top: auto; bottom: 0;
+        width: 100%;
+        gap: 0;
+        padding: 8px 10px calc(10px + env(safe-area-inset-bottom));
+        pointer-events: none;
+        background: transparent;
+      }
+
+      .panel-players {
+        padding: 10px 12px;
+        border-radius: 16px;
+        gap: 8px;
+      }
+
+      .model-list {
+        flex-direction: row;
+        overflow-x: auto;
+        overflow-y: hidden;
+        max-height: none;
+        padding-right: 0;
+        padding-bottom: 2px;
+        gap: 8px;
+        -webkit-overflow-scrolling: touch;
+      }
+
+      .model-item {
+        flex: 0 0 auto;
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 2px;
+        padding: 8px 12px;
+        min-width: 122px;
+      }
+
+      /* El panel de controles en mobile es un drawer desplegable */
+      .panel-controls {
+        position: fixed;
+        left: 10px; right: 10px;
+        bottom: calc(116px + env(safe-area-inset-bottom));
+        z-index: 30;
+        max-height: 58vh;
+        overflow-y: auto;
+        display: none;
+      }
+      .panel-controls.open {
+        display: flex;
+      }
+
+      .mobile-sheet-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding-bottom: 4px;
+        border-bottom: 1px solid var(--border);
+      }
+      .mobile-close {
+        appearance: none;
+        border: none;
+        background: var(--accent-soft);
+        color: var(--accent);
+        font-weight: 700;
+        font-size: 12px;
+        padding: 4px 10px;
+        border-radius: 8px;
+        cursor: pointer;
+      }
+
+      .hint-pill { display: none; }
+
+      .loader-pill {
+        top: 66px; right: 12px;
+        font-size: 11px;
+        padding: 6px 10px;
+      }
+    }
   </style>
 </head>
 <body oncontextmenu="return false;">
@@ -163,33 +458,38 @@
     <canvas id="view-canvas" width="512" height="512"></canvas>
   </div>
 
-  <div class="loader-pill" id="loader-pill">Cargando vistas 360°...</div>
+  <div class="loader-pill" id="loader-pill">Cargando modelo...</div>
 
   <div class="topbar hud">
     <div class="brand">
       <div class="brand-dot"></div>
-      <div>
-        <h1>Football 3D Studio <span class="badge-lock">🔒 360° Sin .GLB expuesto</span></h1>
+      <div style="min-width:0;">
+        <h1>Football 3D Studio</h1>
         <span id="active-name">Cargando catálogo...</span>
       </div>
     </div>
 
     <div class="top-actions">
-      <button class="btn active" id="btn-rotate">⟳ Auto-Giro</button>
-      <button class="btn active" id="btn-smooth" title="Alternar entre Suavizado PBR y Malla Original (Tecla S)">✦ Suavizado</button>
-      <button class="btn" id="btn-wire" title="Ver topología Wireframe (Tecla W)">◈ Wireframe</button>
-      <button class="btn" id="btn-showreel" title="Graba automáticamente un video 360° de todos los jugadores">🎥 Grabar Showreel</button>
-      <button class="btn" id="btn-clean" title="Ocultar interfaz para grabar video (Tecla H)">🎬 Modo Video (H)</button>
+      <button class="btn active" id="btn-rotate" title="Activar/Pausar giro automático (Espacio)">⟳ <span class="btn-label-desktop">Auto-Giro</span></button>
+      <button class="btn active" id="btn-smooth" title="Alternar entre Suavizado y Malla Original (Tecla S)">✦ <span class="btn-label-desktop">Suavizado</span></button>
+      <button class="btn" id="btn-wire" title="Ver topología Wireframe (Tecla W)">◈ <span class="btn-label-desktop">Wireframe</span></button>
+      <button class="btn" id="btn-mobile-drawer" title="Vistas y fondos">⚙ Ajustes</button>
+      <button class="btn" id="btn-clean" title="Ocultar interfaz (Tecla H)">🎬 Modo Limpio (H)</button>
     </div>
   </div>
 
   <aside class="sidebar hud">
-    <div class="panel">
-      <div class="panel-title">Jugadores disponibles (11)</div>
+    <div class="panel panel-players">
+      <div class="panel-title">Jugadores (11)</div>
       <div class="model-list" id="model-list"></div>
     </div>
 
-    <div class="panel">
+    <div class="panel panel-controls" id="panel-controls">
+      <div class="mobile-sheet-header">
+        <span class="panel-title">Opciones de vista</span>
+        <button class="mobile-close" id="btn-close-drawer">Cerrar</button>
+      </div>
+
       <div class="panel-title">Ángulo de vista</div>
       <div class="grid-4">
         <button class="chip" data-angle="0">Frente</button>
@@ -200,9 +500,9 @@
 
       <div class="panel-title" style="margin-top:4px;">Fondo de estudio</div>
       <div class="grid-2">
-        <button class="chip active" data-bg="studio">Estudio Oscuro</button>
-        <button class="chip" data-bg="light">Estudio Claro</button>
-        <button class="chip" data-bg="pitch">Cancha</button>
+        <button class="chip active" data-bg="beige">Beige Estudio</button>
+        <button class="chip" data-bg="crimson">Rojo Oscuro</button>
+        <button class="chip" data-bg="charcoal">Carbón Cálido</button>
         <button class="chip" data-bg="chroma">Chroma Verde</button>
       </div>
 
@@ -218,7 +518,7 @@
   </aside>
 
   <div class="hint-pill hud">
-    Arrastrá con el mouse para girar 360° · <kbd>S</kbd> Suavizado · <kbd>W</kbd> Wireframe · <kbd>H</kbd> Modo Video
+    Arrastrá para girar 360° · <kbd>S</kbd> Suavizado · <kbd>W</kbd> Wireframe · <kbd>H</kbd> Modo Limpio
   </div>
 
   <script>
@@ -234,9 +534,8 @@
     let wireMode = false;
     let autoRotate = true;
     let rotateSpeed = 1.0;
-    let currentBg = 'studio';
+    let currentBg = 'beige';
 
-    // Cache de imágenes por jugador: cache[slug] = { smooth: Image, flat: Image, wire: Image }
     const sheetCache = {};
 
     function getActiveModeKey() {
@@ -267,32 +566,32 @@
       return sheetCache[player.slug];
     }
 
-    function drawCurrentFrame(targetCtx = ctx, w = canvas.width, h = canvas.height, frameIdx = Math.floor(currentFrame) % 24, modeOverride = null) {
+    function drawCurrentFrame() {
       const p = players[currentIndex];
       if (!p) return;
       const sheets = sheetCache[p.slug];
       if (!sheets) return;
 
-      const modeKey = modeOverride || getActiveModeKey();
-      const sheet = sheets[modeKey];
+      const sheet = sheets[getActiveModeKey()];
       if (!sheet) return;
 
       const cols = p.cols || 4;
       const cell = p.cell || 512;
+      const frameIdx = Math.floor(currentFrame);
       const f = ((frameIdx % p.frames) + p.frames) % p.frames;
       const col = f % cols;
       const row = Math.floor(f / cols);
 
-      targetCtx.clearRect(0, 0, w, h);
-      targetCtx.drawImage(sheet, col * cell, row * cell, cell, cell, 0, 0, w, h);
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(sheet, col * cell, row * cell, cell, cell, 0, 0, canvas.width, canvas.height);
 
-      // Marca de agua sutil anti-captura en esquina inferior derecha del frame
-      targetCtx.save();
-      targetCtx.font = '600 11px Inter, system-ui, sans-serif';
-      targetCtx.fillStyle = 'rgba(255, 255, 255, 0.22)';
-      targetCtx.textAlign = 'right';
-      targetCtx.fillText('Football 3D Studio · Preview 360°', w - 14, h - 12);
-      targetCtx.restore();
+      // Marca de agua sutil
+      ctx.save();
+      ctx.font = '600 11px Inter, system-ui, sans-serif';
+      ctx.fillStyle = currentBg === 'beige' ? 'rgba(36, 24, 21, 0.22)' : 'rgba(253, 248, 243, 0.24)';
+      ctx.textAlign = 'right';
+      ctx.fillText('Football 3D Studio', canvas.width - 14, canvas.height - 12);
+      ctx.restore();
     }
 
     async function selectPlayer(index) {
@@ -302,7 +601,7 @@
       renderPlayerList();
       document.getElementById('active-name').textContent = p.name;
       document.getElementById('mesh-stats').innerHTML =
-        `<strong>${p.name}</strong><br/>Vértices: ${p.verts.toLocaleString()}<br/>Triángulos: ${p.tris.toLocaleString()}<br/><span style="color:#86efac;">Archivo .GLB protegido (solo vista 360°)</span>`;
+        `<strong>${p.name}</strong><br/>Vértices: ${p.verts.toLocaleString()}<br/>Triángulos: ${p.tris.toLocaleString()}<br/><span>Vista interactiva 360° · Hunyuan3D 2.0</span>`;
       await ensurePlayerLoaded(p);
       drawCurrentFrame();
     }
@@ -319,7 +618,7 @@
       });
     }
 
-    // Interacción drag 360° (mouse y touch)
+    // Interacción drag 360° (mouse y touch) — arrastrar a la derecha gira hacia la derecha
     let isDragging = false;
     let dragStartX = 0;
     let dragStartFrame = 0;
@@ -334,8 +633,9 @@
     stage.addEventListener('pointermove', (e) => {
       if (!isDragging) return;
       const dx = e.clientX - dragStartX;
-      const deltaFrames = dx / 18;
-      currentFrame = (dragStartFrame + deltaFrames % 24 + 24) % 24;
+      const sensitivity = window.innerWidth <= 860 ? 12 : 16;
+      const deltaFrames = -dx / sensitivity;
+      currentFrame = ((dragStartFrame + deltaFrames) % 24 + 24) % 24;
       drawCurrentFrame();
     });
 
@@ -367,6 +667,18 @@
       document.body.classList.toggle('clean-mode');
     };
 
+    // Drawer mobile
+    const panelControls = document.getElementById('panel-controls');
+    const btnMobileDrawer = document.getElementById('btn-mobile-drawer');
+    btnMobileDrawer.onclick = () => {
+      const open = panelControls.classList.toggle('open');
+      btnMobileDrawer.classList.toggle('active', open);
+    };
+    document.getElementById('btn-close-drawer').onclick = () => {
+      panelControls.classList.remove('open');
+      btnMobileDrawer.classList.remove('active');
+    };
+
     document.getElementById('rotate-speed').oninput = (e) => {
       rotateSpeed = parseFloat(e.target.value);
       document.getElementById('speed-val').textContent = `${rotateSpeed.toFixed(1)}x`;
@@ -380,111 +692,21 @@
     });
 
     const bgStyles = {
-      studio: 'radial-gradient(circle at 50% 35%, #1e293b 0%, #090d16 75%)',
-      light: 'radial-gradient(circle at 50% 35%, #f8fafc 0%, #cbd5e1 85%)',
-      pitch: 'radial-gradient(circle at 50% 40%, #14532d 0%, #052e16 80%)',
+      beige: 'radial-gradient(circle at 52% 38%, #f7f1e6 0%, #e4d6c2 68%, #d2bfa6 100%)',
+      crimson: 'radial-gradient(circle at 50% 35%, #5c1820 0%, #2a0a0e 72%, #170507 100%)',
+      charcoal: 'radial-gradient(circle at 50% 35%, #332924 0%, #1c1613 78%)',
       chroma: '#00b140',
     };
+
     document.querySelectorAll('[data-bg]').forEach((btn) => {
       btn.onclick = () => {
         document.querySelectorAll('[data-bg]').forEach((b) => b.classList.remove('active'));
         btn.classList.add('active');
         currentBg = btn.dataset.bg;
         document.body.style.background = bgStyles[currentBg];
+        drawCurrentFrame();
       };
     });
-
-    // Grabador automático de Showreel (.webm) recorriendo los 11 jugadores
-    const btnShowreel = document.getElementById('btn-showreel');
-    let showreel = {
-      active: false,
-      recorder: null,
-      canvas: null,
-      ctx: null,
-      modelIdx: 0,
-      modelStart: 0,
-      durationMs: 4200,
-      prevIndex: 0,
-    };
-
-    function drawRecordBg(rCtx, w, h) {
-      if (currentBg === 'chroma') {
-        rCtx.fillStyle = '#00b140';
-        rCtx.fillRect(0, 0, w, h);
-        return;
-      }
-      const grad = rCtx.createRadialGradient(w * 0.5, h * 0.35, 10, w * 0.5, h * 0.45, Math.max(w, h) * 0.65);
-      if (currentBg === 'light') {
-        grad.addColorStop(0, '#f8fafc');
-        grad.addColorStop(1, '#cbd5e1');
-      } else if (currentBg === 'pitch') {
-        grad.addColorStop(0, '#14532d');
-        grad.addColorStop(1, '#052e16');
-      } else {
-        grad.addColorStop(0, '#1e293b');
-        grad.addColorStop(1, '#090d16');
-      }
-      rCtx.fillStyle = grad;
-      rCtx.fillRect(0, 0, w, h);
-    }
-
-    function stopShowreel() {
-      if (!showreel.active) return;
-      showreel.active = false;
-      if (showreel.recorder && showreel.recorder.state !== 'inactive') {
-        showreel.recorder.stop();
-      }
-      btnShowreel.classList.remove('active');
-      btnShowreel.textContent = '🎥 Grabar Showreel';
-      selectPlayer(showreel.prevIndex);
-    }
-
-    btnShowreel.onclick = async () => {
-      if (showreel.active) {
-        stopShowreel();
-        return;
-      }
-      btnShowreel.textContent = '⏳ Precargando...';
-      for (const p of players) {
-        await ensurePlayerLoaded(p);
-      }
-
-      const recCanvas = document.createElement('canvas');
-      recCanvas.width = 1280;
-      recCanvas.height = 720;
-      const recCtx = recCanvas.getContext('2d');
-
-      const mime = ['video/webm;codecs=vp9', 'video/webm;codecs=vp8', 'video/webm'].find((m) =>
-        MediaRecorder.isTypeSupported(m)
-      ) || 'video/webm';
-
-      const stream = recCanvas.captureStream(60);
-      const recorder = new MediaRecorder(stream, { mimeType: mime, videoBitsPerSecond: 8000000 });
-      const chunks = [];
-      recorder.ondataavailable = (e) => { if (e.data && e.data.size > 0) chunks.push(e.data); };
-      recorder.onstop = () => {
-        const blob = new Blob(chunks, { type: mime });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = 'football3d_showreel_360.webm';
-        a.click();
-        setTimeout(() => URL.revokeObjectURL(url), 5000);
-      };
-
-      showreel.prevIndex = currentIndex;
-      showreel.canvas = recCanvas;
-      showreel.ctx = recCtx;
-      showreel.recorder = recorder;
-      showreel.modelIdx = 0;
-      showreel.modelStart = performance.now();
-      showreel.active = true;
-
-      await selectPlayer(0);
-      btnShowreel.classList.add('active');
-      btnShowreel.textContent = `⏹ Grabando (1/${players.length})`;
-      recorder.start(100);
-    };
 
     window.addEventListener('keydown', (e) => {
       if (e.key.toLowerCase() === 'h') document.body.classList.toggle('clean-mode');
@@ -502,53 +724,8 @@
       const dt = (now - lastTime) / 1000;
       lastTime = now;
 
-      if (showreel.active) {
-        const elapsed = now - showreel.modelStart;
-        const t = Math.min(1, elapsed / showreel.durationMs);
-        const frameIdx = Math.floor(t * 24) % 24;
-        const modeOverride = (t >= 0.70 && t <= 0.90) ? 'wire' : (smoothMode ? 'smooth' : 'flat');
-
-        currentFrame = frameIdx;
-        drawCurrentFrame(ctx, canvas.width, canvas.height, frameIdx, modeOverride);
-
-        const w = showreel.canvas.width;
-        const h = showreel.canvas.height;
-        const rCtx = showreel.ctx;
-        drawRecordBg(rCtx, w, h);
-
-        const size = Math.min(w, h) * 0.88;
-        rCtx.drawImage(canvas, (w - size) / 2, (h - size) / 2, size, size);
-
-        const p = players[showreel.modelIdx];
-        if (p) {
-          rCtx.save();
-          rCtx.font = '700 28px Inter, system-ui, sans-serif';
-          rCtx.fillStyle = currentBg === 'light' ? '#0f172a' : '#f1f5f9';
-          rCtx.fillText(p.name.toUpperCase(), 36, h - 54);
-          rCtx.font = '500 16px Inter, system-ui, sans-serif';
-          rCtx.fillStyle = currentBg === 'light' ? '#475569' : '#94a3b8';
-          const tag = modeOverride === 'wire' ? 'Topología 3D (Wireframe)' : 'Football 3D Studio · Hunyuan3D 2.0';
-          rCtx.fillText(tag, 36, h - 28);
-          rCtx.restore();
-        }
-
-        if (elapsed >= showreel.durationMs) {
-          showreel.modelIdx++;
-          if (showreel.modelIdx >= players.length) {
-            stopShowreel();
-          } else {
-            currentIndex = showreel.modelIdx;
-            renderPlayerList();
-            document.getElementById('active-name').textContent = players[currentIndex].name;
-            showreel.modelStart = now;
-            btnShowreel.textContent = `⏹ Grabando (${showreel.modelIdx + 1}/${players.length})`;
-          }
-        }
-        return;
-      }
-
       if (autoRotate && !isDragging && players.length > 0) {
-        currentFrame = (currentFrame + dt * 6 * rotateSpeed) % 24;
+        currentFrame = ((currentFrame - dt * 5.5 * rotateSpeed) % 24 + 24) % 24;
         drawCurrentFrame();
       }
     }
